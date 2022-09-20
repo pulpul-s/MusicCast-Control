@@ -1,4 +1,4 @@
-namespace MusicCast_PlainControl
+namespace MusicCast_Control
 {
     internal static class Program
     {

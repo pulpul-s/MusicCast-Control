@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Nodes;
 using File = System.IO.File;
 
-namespace MusicCast_PlainControl
+namespace MusicCast_Control
 {
     partial class Form1
     {

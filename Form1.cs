@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Text.Json.Nodes;
 
-namespace MusicCast_PlainControl
+namespace MusicCast_Control
 {
     public partial class Form1 : Form
     {
@@ -58,7 +58,7 @@ namespace MusicCast_PlainControl
 
         private async void inputChange_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.ActiveControl = null;
+            this.ActiveControl = null; // prevent focus after selection to make it prettier
             using var client = new HttpClient();
             string input = (string)inputChange.SelectedItem;
             switch (input)
