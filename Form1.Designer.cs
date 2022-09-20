@@ -36,13 +36,12 @@ namespace MusicCast_Control
             this.voldwn_btn = new System.Windows.Forms.Button();
             this.powerButton = new System.Windows.Forms.Button();
             this.cypyright = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.ip_address = new System.Windows.Forms.TextBox();
             this.model_name = new System.Windows.Forms.TextBox();
             this.inputChange = new System.Windows.Forms.ComboBox();
             this.info = new System.Windows.Forms.Label();
             this.volume = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.center_text = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // volup_btn
@@ -51,7 +50,7 @@ namespace MusicCast_Control
             this.volup_btn.Cursor = System.Windows.Forms.Cursors.Hand;
             this.volup_btn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.volup_btn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.volup_btn.Location = new System.Drawing.Point(176, 66);
+            this.volup_btn.Location = new System.Drawing.Point(176, 65);
             this.volup_btn.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.volup_btn.Name = "volup_btn";
             this.volup_btn.Size = new System.Drawing.Size(44, 25);
@@ -66,7 +65,7 @@ namespace MusicCast_Control
             this.voldwn_btn.Cursor = System.Windows.Forms.Cursors.Hand;
             this.voldwn_btn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.voldwn_btn.ForeColor = System.Drawing.Color.Black;
-            this.voldwn_btn.Location = new System.Drawing.Point(64, 66);
+            this.voldwn_btn.Location = new System.Drawing.Point(64, 65);
             this.voldwn_btn.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.voldwn_btn.Name = "voldwn_btn";
             this.voldwn_btn.Size = new System.Drawing.Size(41, 25);
@@ -99,19 +98,6 @@ namespace MusicCast_Control
             this.cypyright.TabIndex = 7;
             this.cypyright.Text = "MusicCast Control 0.0.1";
             this.cypyright.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.pictureBox1.Image = global::MusicCast_Control.Properties.Resources.musiccast_logo;
-            this.pictureBox1.Location = new System.Drawing.Point(64, 30);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(156, 26);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox1.TabIndex = 8;
-            this.pictureBox1.TabStop = false;
             // 
             // ip_address
             // 
@@ -154,7 +140,7 @@ namespace MusicCast_Control
             "Optical",
             "Spotify",
             "USB"});
-            this.inputChange.Location = new System.Drawing.Point(64, 93);
+            this.inputChange.Location = new System.Drawing.Point(64, 92);
             this.inputChange.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.inputChange.Name = "inputChange";
             this.inputChange.Size = new System.Drawing.Size(156, 23);
@@ -178,7 +164,7 @@ namespace MusicCast_Control
             // 
             this.volume.AutoSize = true;
             this.volume.Font = new System.Drawing.Font("Segoe UI", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.volume.Location = new System.Drawing.Point(109, 69);
+            this.volume.Location = new System.Drawing.Point(109, 68);
             this.volume.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.volume.MinimumSize = new System.Drawing.Size(62, 0);
             this.volume.Name = "volume";
@@ -187,6 +173,17 @@ namespace MusicCast_Control
             this.volume.Text = "--.- dB";
             this.volume.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // center_text
+            // 
+            this.center_text.AutoSize = true;
+            this.center_text.Font = new System.Drawing.Font("Constantia", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.center_text.Location = new System.Drawing.Point(32, 31);
+            this.center_text.Name = "center_text";
+            this.center_text.Size = new System.Drawing.Size(220, 29);
+            this.center_text.TabIndex = 15;
+            this.center_text.Text = "MusicCast Control";
+            this.center_text.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -194,12 +191,12 @@ namespace MusicCast_Control
             this.BackColor = System.Drawing.Color.Black;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(284, 151);
+            this.Controls.Add(this.center_text);
             this.Controls.Add(this.volume);
             this.Controls.Add(this.info);
             this.Controls.Add(this.inputChange);
             this.Controls.Add(this.model_name);
             this.Controls.Add(this.ip_address);
-            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.cypyright);
             this.Controls.Add(this.powerButton);
             this.Controls.Add(this.voldwn_btn);
@@ -213,7 +210,6 @@ namespace MusicCast_Control
             this.Name = "Form1";
             this.Text = "MusicCast Control";
             this.Load += new System.EventHandler(this.Form1_Load);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -294,12 +290,12 @@ namespace MusicCast_Control
         private string maxVol;
         private string curVol;
         private Label cypyright;
-        private PictureBox pictureBox1;
         private TextBox ip_address;
         private string mcip;
         private TextBox model_name;
         private ComboBox inputChange;
         private Label volume;
         private string currentInput;
+        private Label center_text;
     }
 }
