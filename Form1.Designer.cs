@@ -97,7 +97,7 @@ namespace MusicCast_Control
             this.cypyright.Name = "cypyright";
             this.cypyright.Size = new System.Drawing.Size(159, 13);
             this.cypyright.TabIndex = 7;
-            this.cypyright.Text = "kyllisofta kopyraitti (SEE) 2022";
+            this.cypyright.Text = "MusicCast Control 0.0.1";
             this.cypyright.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // pictureBox1
