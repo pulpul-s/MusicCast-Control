@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 
 namespace MusicCast_Control
 {
@@ -16,10 +17,57 @@ namespace MusicCast_Control
             backgroundUpdate();
         }
 
-        private async void button3_Click(object sender, EventArgs e)
+        private async void power_button_Click(object sender, EventArgs e)
         {
+            // power toggle
             using var client = new HttpClient();
             var powerToggle = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setPower?power=toggle");
+        }
+
+        private async void volumedown_button_Click(object sender, EventArgs e)
+        {
+            // volume -
+            if (Convert.ToInt32(curVol) > 0)
+            {
+                int setVol = Convert.ToInt32(curVol) - 1;
+                using var client = new HttpClient();
+                var incVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setVolume?volume=" + setVol);
+                curVol = Convert.ToString(setVol);
+                mute = false;
+                updateVolume();
+            }
+        }
+
+        private async void volumeup_button_Click(object sender, EventArgs e)
+        {
+            // volume +
+            if (Convert.ToInt32(curVol) < Convert.ToInt32(maxVol))
+            {
+                int setVol = Convert.ToInt32(curVol) + 1;
+                using var client = new HttpClient();
+                var incVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setVolume?volume=" + setVol);
+                curVol = Convert.ToString(setVol);
+                mute = false;
+                updateVolume();
+            }
+        }
+
+        private async void mute_button_Click(object sender, EventArgs e)
+        {
+            using var client = new HttpClient();
+            if (!mute)
+            {
+                var muteVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setMute?enable=true");
+                mute = true;
+                volume.Text = "muted";
+            }
+            else
+            {
+                var muteVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setMute?enable=false");
+                updateVolume();
+                mute = false;
+            }
+            
         }
 
         private async void button2_Click(object sender, EventArgs e)
@@ -60,49 +108,13 @@ namespace MusicCast_Control
         {
             this.ActiveControl = null; // prevent focus after selection to make it prettier
             using var client = new HttpClient();
-            string input = (string)inputChange.SelectedItem;
-            switch (input)
+
+            // check which input is selected, convert it to lowercase in case and switch to it
+            var selectedInput = ((string)inputChange.SelectedItem).ToLower();
+            if (currentInput != selectedInput)
             {
-                case "AUX":
-                    if (currentInput != "aux")
-                    {
-                        var inputchange = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setInput?input=aux");
-                        currentInput = "aux";
-                    }
-                    break;
-
-                case "Bluetooth":
-                    if (currentInput != "bluetooth")
-                    {
-                        var inputchange = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setInput?input=bluetooth");
-                        currentInput = "bluetooth";
-                    }
-                    break;
-
-                case "Optical":
-                    if (currentInput != "optical")
-                    {
-                        var inputchange = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setInput?input=optical");
-                        currentInput = "optical";
-                    }
-                    break;
-
-                case "USB":
-                    if (currentInput != "usb")
-                    {
-                        var inputchange = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setInput?input=usb");
-                        currentInput = "usb";
-                    }
-                    break;
-
-                case "Spotify":
-                    if (currentInput != "spotify")
-                    {
-                        var inputchange = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setInput?input=spotify");
-                        currentInput = "spotify";
-                    }
-                    break;
-
+                await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setInput?input=" + selectedInput);
+                currentInput = selectedInput;
             }
         }
 
@@ -122,8 +134,25 @@ namespace MusicCast_Control
                 var statusjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/getStatus");
                 var status = JsonObject.Parse(statusjson);
                 info.Text = "Power: " + (string)status["power"] + "; Input: " + (string)status["input"];
-                volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
+                if (mute)
+                {
+                    volume.Text = "muted";
+                }
+                else
+                {
+                    volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
+                }
                 System.Threading.Thread.Sleep(1000);
+            }
+        }
+
+ 
+
+        private void center_text_Click(object sender, EventArgs e)
+        {
+            if (center_text.Text != "Not connected")
+            {
+                MessageBox.Show(center_text.Text + "\nList of supported inputs\n" + Regex.Replace(input_list, "[\\[\\]]", ""), "Input list");
             }
         }
     }

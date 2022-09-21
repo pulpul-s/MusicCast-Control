@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using File = System.IO.File;
 
 namespace MusicCast_Control
@@ -32,61 +33,32 @@ namespace MusicCast_Control
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
-            this.volup_btn = new System.Windows.Forms.Button();
-            this.voldwn_btn = new System.Windows.Forms.Button();
-            this.powerButton = new System.Windows.Forms.Button();
+            this.power_button = new System.Windows.Forms.Button();
             this.cypyright = new System.Windows.Forms.Label();
-            this.ip_address = new System.Windows.Forms.TextBox();
-            this.model_name = new System.Windows.Forms.TextBox();
             this.inputChange = new System.Windows.Forms.ComboBox();
             this.info = new System.Windows.Forms.Label();
             this.volume = new System.Windows.Forms.Label();
             this.center_text = new System.Windows.Forms.Label();
+            this.ip_address = new System.Windows.Forms.Label();
+            this.mute_button = new System.Windows.Forms.Button();
+            this.volumedown_button = new System.Windows.Forms.Button();
+            this.volumeup_button = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // volup_btn
+            // power_button
             // 
-            this.volup_btn.AutoSize = true;
-            this.volup_btn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.volup_btn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.volup_btn.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.volup_btn.Location = new System.Drawing.Point(176, 65);
-            this.volup_btn.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
-            this.volup_btn.Name = "volup_btn";
-            this.volup_btn.Size = new System.Drawing.Size(44, 25);
-            this.volup_btn.TabIndex = 0;
-            this.volup_btn.Text = "+ Vol";
-            this.volup_btn.UseVisualStyleBackColor = true;
-            this.volup_btn.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // voldwn_btn
-            // 
-            this.voldwn_btn.AutoSize = true;
-            this.voldwn_btn.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.voldwn_btn.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.voldwn_btn.ForeColor = System.Drawing.Color.Black;
-            this.voldwn_btn.Location = new System.Drawing.Point(64, 65);
-            this.voldwn_btn.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
-            this.voldwn_btn.Name = "voldwn_btn";
-            this.voldwn_btn.Size = new System.Drawing.Size(41, 25);
-            this.voldwn_btn.TabIndex = 3;
-            this.voldwn_btn.Text = "- Vol";
-            this.voldwn_btn.UseVisualStyleBackColor = true;
-            this.voldwn_btn.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // powerButton
-            // 
-            this.powerButton.AutoSize = true;
-            this.powerButton.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.powerButton.ForeColor = System.Drawing.Color.Black;
-            this.powerButton.Location = new System.Drawing.Point(232, 2);
-            this.powerButton.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
-            this.powerButton.Name = "powerButton";
-            this.powerButton.Size = new System.Drawing.Size(50, 25);
-            this.powerButton.TabIndex = 6;
-            this.powerButton.Text = "Power";
-            this.powerButton.UseVisualStyleBackColor = true;
-            this.powerButton.Click += new System.EventHandler(this.button3_Click);
+            this.power_button.AutoSize = true;
+            this.power_button.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("power_button.BackgroundImage")));
+            this.power_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.power_button.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.power_button.ForeColor = System.Drawing.Color.Fuchsia;
+            this.power_button.Location = new System.Drawing.Point(250, 3);
+            this.power_button.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.power_button.Name = "power_button";
+            this.power_button.Size = new System.Drawing.Size(32, 24);
+            this.power_button.TabIndex = 6;
+            this.power_button.UseVisualStyleBackColor = true;
+            this.power_button.Click += new System.EventHandler(this.power_button_Click);
             // 
             // cypyright
             // 
@@ -96,36 +68,8 @@ namespace MusicCast_Control
             this.cypyright.Name = "cypyright";
             this.cypyright.Size = new System.Drawing.Size(159, 13);
             this.cypyright.TabIndex = 7;
-            this.cypyright.Text = "MusicCast Control 0.0.1";
+            this.cypyright.Text = "MusicCast Control 0.0.2";
             this.cypyright.TextAlign = System.Drawing.ContentAlignment.BottomRight;
-            // 
-            // ip_address
-            // 
-            this.ip_address.BackColor = System.Drawing.Color.Black;
-            this.ip_address.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.ip_address.Font = new System.Drawing.Font("Segoe UI", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ip_address.ForeColor = System.Drawing.Color.White;
-            this.ip_address.Location = new System.Drawing.Point(1, 139);
-            this.ip_address.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
-            this.ip_address.MaxLength = 15;
-            this.ip_address.Name = "ip_address";
-            this.ip_address.Size = new System.Drawing.Size(84, 14);
-            this.ip_address.TabIndex = 9;
-            this.ip_address.Text = "0.0.0.0";
-            // 
-            // model_name
-            // 
-            this.model_name.BackColor = System.Drawing.Color.Black;
-            this.model_name.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.model_name.Font = new System.Drawing.Font("Segoe UI", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.model_name.ForeColor = System.Drawing.Color.White;
-            this.model_name.Location = new System.Drawing.Point(1, 128);
-            this.model_name.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
-            this.model_name.MaxLength = 155;
-            this.model_name.Name = "model_name";
-            this.model_name.Size = new System.Drawing.Size(84, 14);
-            this.model_name.TabIndex = 10;
-            this.model_name.Text = "Model";
             // 
             // inputChange
             // 
@@ -134,16 +78,10 @@ namespace MusicCast_Control
             this.inputChange.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.inputChange.ForeColor = System.Drawing.Color.White;
             this.inputChange.FormattingEnabled = true;
-            this.inputChange.Items.AddRange(new object[] {
-            "AUX",
-            "Bluetooth",
-            "Optical",
-            "Spotify",
-            "USB"});
-            this.inputChange.Location = new System.Drawing.Point(64, 92);
+            this.inputChange.Location = new System.Drawing.Point(76, 90);
             this.inputChange.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
             this.inputChange.Name = "inputChange";
-            this.inputChange.Size = new System.Drawing.Size(156, 23);
+            this.inputChange.Size = new System.Drawing.Size(132, 23);
             this.inputChange.TabIndex = 11;
             this.inputChange.SelectedIndexChanged += new System.EventHandler(this.inputChange_SelectedIndexChanged);
             // 
@@ -164,7 +102,7 @@ namespace MusicCast_Control
             // 
             this.volume.AutoSize = true;
             this.volume.Font = new System.Drawing.Font("Segoe UI", 10.125F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.volume.Location = new System.Drawing.Point(109, 68);
+            this.volume.Location = new System.Drawing.Point(111, 65);
             this.volume.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.volume.MinimumSize = new System.Drawing.Size(62, 0);
             this.volume.Name = "volume";
@@ -175,14 +113,70 @@ namespace MusicCast_Control
             // 
             // center_text
             // 
-            this.center_text.AutoSize = true;
             this.center_text.Font = new System.Drawing.Font("Constantia", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.center_text.Location = new System.Drawing.Point(32, 31);
+            this.center_text.Location = new System.Drawing.Point(42, 30);
             this.center_text.Name = "center_text";
-            this.center_text.Size = new System.Drawing.Size(220, 29);
+            this.center_text.Size = new System.Drawing.Size(200, 29);
             this.center_text.TabIndex = 15;
-            this.center_text.Text = "MusicCast Control";
+            this.center_text.Text = "Not connected";
             this.center_text.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.center_text.Click += new System.EventHandler(this.center_text_Click);
+            // 
+            // ip_address
+            // 
+            this.ip_address.AutoSize = true;
+            this.ip_address.Font = new System.Drawing.Font("Segoe UI", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.ip_address.Location = new System.Drawing.Point(-2, 139);
+            this.ip_address.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.ip_address.Name = "ip_address";
+            this.ip_address.Size = new System.Drawing.Size(40, 13);
+            this.ip_address.TabIndex = 17;
+            this.ip_address.Text = "0.0.0.0";
+            // 
+            // mute_button
+            // 
+            this.mute_button.AutoSize = true;
+            this.mute_button.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("mute_button.BackgroundImage")));
+            this.mute_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.mute_button.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.mute_button.ForeColor = System.Drawing.Color.Red;
+            this.mute_button.Location = new System.Drawing.Point(222, 5);
+            this.mute_button.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.mute_button.Name = "mute_button";
+            this.mute_button.Size = new System.Drawing.Size(28, 21);
+            this.mute_button.TabIndex = 18;
+            this.mute_button.UseVisualStyleBackColor = true;
+            this.mute_button.Click += new System.EventHandler(this.mute_button_Click);
+            // 
+            // volumedown_button
+            // 
+            this.volumedown_button.AutoSize = true;
+            this.volumedown_button.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("volumedown_button.BackgroundImage")));
+            this.volumedown_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.volumedown_button.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.volumedown_button.ForeColor = System.Drawing.Color.Green;
+            this.volumedown_button.Location = new System.Drawing.Point(76, 64);
+            this.volumedown_button.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.volumedown_button.Name = "volumedown_button";
+            this.volumedown_button.Size = new System.Drawing.Size(28, 21);
+            this.volumedown_button.TabIndex = 19;
+            this.volumedown_button.UseVisualStyleBackColor = true;
+            this.volumedown_button.Click += new System.EventHandler(this.volumedown_button_Click);
+            // 
+            // volumeup_button
+            // 
+            this.volumeup_button.AutoSize = true;
+            this.volumeup_button.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("volumeup_button.BackgroundImage")));
+            this.volumeup_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
+            this.volumeup_button.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
+            this.volumeup_button.ForeColor = System.Drawing.Color.LawnGreen;
+            this.volumeup_button.Location = new System.Drawing.Point(180, 64);
+            this.volumeup_button.Margin = new System.Windows.Forms.Padding(2, 1, 2, 1);
+            this.volumeup_button.Name = "volumeup_button";
+            this.volumeup_button.Size = new System.Drawing.Size(28, 21);
+            this.volumeup_button.TabIndex = 20;
+            this.volumeup_button.UseVisualStyleBackColor = true;
+            this.volumeup_button.Click += new System.EventHandler(this.volumeup_button_Click);
             // 
             // Form1
             // 
@@ -191,16 +185,16 @@ namespace MusicCast_Control
             this.BackColor = System.Drawing.Color.Black;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(284, 151);
+            this.Controls.Add(this.volumeup_button);
+            this.Controls.Add(this.volumedown_button);
+            this.Controls.Add(this.mute_button);
+            this.Controls.Add(this.ip_address);
             this.Controls.Add(this.center_text);
             this.Controls.Add(this.volume);
             this.Controls.Add(this.info);
             this.Controls.Add(this.inputChange);
-            this.Controls.Add(this.model_name);
-            this.Controls.Add(this.ip_address);
             this.Controls.Add(this.cypyright);
-            this.Controls.Add(this.powerButton);
-            this.Controls.Add(this.voldwn_btn);
-            this.Controls.Add(this.volup_btn);
+            this.Controls.Add(this.power_button);
             this.DoubleBuffered = true;
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -217,17 +211,32 @@ namespace MusicCast_Control
 
         private async void labels()
         {
+
             //
-            // read the musiccast ip address from settings.ini
+            // read the json settings file
             //
-            if (File.Exists("settings.ini"))
+            string[] inputs = new string[50];
+            if (File.Exists("settings.json"))
             {
-                mcip = File.ReadLines("settings.ini").Skip(1).Take(1).First();
+                string settingsjson = File.ReadAllText("settings.json");
+                var settings = JsonObject.Parse(settingsjson);
+
+                // add inputs to combobox
+                inputs = Regex.Replace(Convert.ToString(settings["inputs"]), "[ \"\n\r\\[\\]\t]", "").Split(","); // fix this at some point
+                foreach (var input in inputs)
+                {
+                    this.inputChange.Items.Add(input);
+
+                }
+                // set the ip address
+                mcip = settings["ip_address"].ToString();
             } else
-            { // fall back to a generic local network ip
+            {
+                this.inputChange.Items.Add("Optical");
                 mcip = "192.168.0.10";
             }
-            ip_address.Text = mcip;
+            ip_address.Text = mcip; // change ip info label
+
 
             //
             // get the amplifier status, device info and features
@@ -239,7 +248,7 @@ namespace MusicCast_Control
             var status = JsonObject.Parse(statusjson);
             var deviceinfo = JsonObject.Parse(deviceinfojson);
             var features = JsonObject.Parse(featuresjson);
-
+            input_list = Convert.ToString(features["zone"][0]["input_list"]);
 
 
             // 
@@ -249,53 +258,51 @@ namespace MusicCast_Control
             info.Text = "Power: " + (string)status["power"] + "; Input: " + (string)status["input"];
             
             // device model
-            model_name.Text = (string)deviceinfo["model_name"];
-
-            // volume
-            volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
+            center_text.Text = (string)deviceinfo["model_name"];
 
             // get the maximum, current volume and startup input source
             maxVol = Convert.ToString(status["max_volume"]);
             curVol = Convert.ToString(status["volume"]);
             currentInput = Convert.ToString(status["input"]);
+            mute = (bool)status["mute"];
 
-            // select the appropriate input device
-            switch ((string)status["input"])
+            // volume
+            if (mute)
             {
-                case "AUX":
-                    inputChange.Text = "AUX";
-                    break;
-                case "Bluetooth":
-                    inputChange.Text = "Bluetooth";
-                    break;
-                case "optical":
-                    inputChange.Text = "Optical";
-                    break;
-                case "Spotify":
-                    inputChange.Text = "Spotify";
-                    break;
-                case "USB":
-                    inputChange.Text = "USB";
-                    break;
+                volume.Text = "muted";
+            }
+            else
+            {
+                volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
+            }
+
+            // Show the selected input on input list as default
+            foreach (var input in inputs)
+            {
+                if (currentInput == input.ToLower())
+                {
+                    inputChange.Text = input;
+                }
             }
                 
         }
 
         #endregion
-
-        private Button volup_btn;
-        private Button voldwn_btn;
-        private Button powerButton;
+        private Button power_button;
         private Label info;
         private string maxVol;
         private string curVol;
         private Label cypyright;
-        private TextBox ip_address;
         private string mcip;
-        private TextBox model_name;
         private ComboBox inputChange;
         private Label volume;
         private string currentInput;
         private Label center_text;
+        private string input_list;
+        private Label ip_address;
+        private Button mute_button;
+        private bool mute;
+        private Button volumedown_button;
+        private Button volumeup_button;
     }
 }
