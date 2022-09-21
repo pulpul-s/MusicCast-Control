@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Net.NetworkInformation;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
@@ -9,14 +10,112 @@ namespace MusicCast_Control
         public Form1()
         {
             InitializeComponent();
-            labels();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            backgroundUpdate();
+            read_settings();
+            var ping = new Ping();
+            var pingresult = ping.Send(mcip);
+            if (pingresult.Status == 0)
+            {
+                fetch_info();
+                backgroundUpdate();
+            }
+            else
+            {
+                center_text.Text = "IP unreachable";
+            }
         }
 
+
+        //
+        // read the json settings file
+        //
+        string[] inputs = new string[50];
+        private async void read_settings()
+        {
+
+            if (File.Exists("settings.json"))
+            {
+                string settingsjson = File.ReadAllText("settings.json");
+                var settings = JsonObject.Parse(settingsjson);
+
+                // add inputs to combobox
+                inputs = Regex.Replace(Convert.ToString(settings["inputs"]), "[ \"\n\r\\[\\]\t]", "").Split(","); // fix this at some point
+                foreach (var input in inputs)
+                {
+                    this.inputChange.Items.Add(input);
+
+                }
+                // set the ip address
+                mcip = settings["ip_address"].ToString();
+            }
+            else
+            {
+                this.inputChange.Items.Add("Optical");
+                mcip = "192.168.0.10";
+            }
+            ip_address.Text = mcip; // change ip info label
+        }
+
+        //
+        // get the amplifier status, device info and features
+        //
+        private async void fetch_info()
+        {
+            using var client = new HttpClient();
+
+            var statusjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/getStatus");
+            var deviceinfojson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getDeviceInfo");
+            var featuresjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getFeatures");
+
+            var status = JsonObject.Parse(statusjson);
+            var deviceinfo = JsonObject.Parse(deviceinfojson);
+            var features = JsonObject.Parse(featuresjson);
+            input_list = Convert.ToString(features["zone"][0]["input_list"]);
+
+
+            // 
+            // info fields
+            // 
+            // power and input on start
+            info.Text = "Power: " + (string)status["power"] + "; Input: " + (string)status["input"];
+
+            // device model
+            center_text.Text = (string)deviceinfo["model_name"];
+
+            // get the maximum, current volume and startup input source
+            maxVol = Convert.ToString(status["max_volume"]);
+            curVol = Convert.ToString(status["volume"]);
+            currentInput = Convert.ToString(status["input"]);
+            mute = (bool)status["mute"];
+
+            // volume
+            if (mute)
+            {
+                volume.Text = "muted";
+            }
+            else
+            {
+                volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
+            }
+
+            // Show the selected input on input list as default
+            foreach (var input in inputs)
+            {
+                if (currentInput == input.ToLower())
+                {
+                    inputChange.Text = input;
+                }
+            }
+
+
+        }
+
+        //
+        // labels, buttons etc functionality
+        //
         private async void power_button_Click(object sender, EventArgs e)
         {
             // power toggle
@@ -67,7 +166,7 @@ namespace MusicCast_Control
                 updateVolume();
                 mute = false;
             }
-            
+
         }
 
         private async void button2_Click(object sender, EventArgs e)
@@ -118,6 +217,14 @@ namespace MusicCast_Control
             }
         }
 
+        private void center_text_Click(object sender, EventArgs e)
+        {
+            if (center_text.Text != "Not connected")
+            {
+                MessageBox.Show(center_text.Text + "\nList of supported inputs\n" + Regex.Replace(input_list, "[\\[\\]]", ""), "Input list");
+            }
+        }
+
 
         BackgroundWorker bg;
         private async void backgroundUpdate()
@@ -143,16 +250,6 @@ namespace MusicCast_Control
                     volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
                 }
                 System.Threading.Thread.Sleep(1000);
-            }
-        }
-
- 
-
-        private void center_text_Click(object sender, EventArgs e)
-        {
-            if (center_text.Text != "Not connected")
-            {
-                MessageBox.Show(center_text.Text + "\nList of supported inputs\n" + Regex.Replace(input_list, "[\\[\\]]", ""), "Input list");
             }
         }
     }

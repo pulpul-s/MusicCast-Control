@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Nodes;
-using System.Text.RegularExpressions;
-using File = System.IO.File;
+﻿
 
 namespace MusicCast_Control
 {
@@ -48,7 +46,7 @@ namespace MusicCast_Control
             // power_button
             // 
             this.power_button.AutoSize = true;
-            this.power_button.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("power_button.BackgroundImage")));
+            this.power_button.BackgroundImage = global::MusicCast_Control.Properties.Resources.power;
             this.power_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.power_button.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.power_button.ForeColor = System.Drawing.Color.Fuchsia;
@@ -63,12 +61,12 @@ namespace MusicCast_Control
             // cypyright
             // 
             this.cypyright.Font = new System.Drawing.Font("Segoe UI", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.cypyright.Location = new System.Drawing.Point(127, 137);
+            this.cypyright.Location = new System.Drawing.Point(127, 138);
             this.cypyright.Margin = new System.Windows.Forms.Padding(0);
             this.cypyright.Name = "cypyright";
             this.cypyright.Size = new System.Drawing.Size(159, 13);
             this.cypyright.TabIndex = 7;
-            this.cypyright.Text = "MusicCast Control 0.0.2";
+            this.cypyright.Text = "MusicCast Control 0.0.3";
             this.cypyright.TextAlign = System.Drawing.ContentAlignment.BottomRight;
             // 
             // inputChange
@@ -118,7 +116,7 @@ namespace MusicCast_Control
             this.center_text.Name = "center_text";
             this.center_text.Size = new System.Drawing.Size(200, 29);
             this.center_text.TabIndex = 15;
-            this.center_text.Text = "Not connected";
+            this.center_text.Text = "Connecting";
             this.center_text.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.center_text.Click += new System.EventHandler(this.center_text_Click);
             // 
@@ -126,7 +124,7 @@ namespace MusicCast_Control
             // 
             this.ip_address.AutoSize = true;
             this.ip_address.Font = new System.Drawing.Font("Segoe UI", 7.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ip_address.Location = new System.Drawing.Point(-2, 139);
+            this.ip_address.Location = new System.Drawing.Point(-1, 138);
             this.ip_address.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.ip_address.Name = "ip_address";
             this.ip_address.Size = new System.Drawing.Size(40, 13);
@@ -136,7 +134,7 @@ namespace MusicCast_Control
             // mute_button
             // 
             this.mute_button.AutoSize = true;
-            this.mute_button.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("mute_button.BackgroundImage")));
+            this.mute_button.BackgroundImage = global::MusicCast_Control.Properties.Resources.volmute;
             this.mute_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.mute_button.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.mute_button.ForeColor = System.Drawing.Color.Red;
@@ -151,7 +149,7 @@ namespace MusicCast_Control
             // volumedown_button
             // 
             this.volumedown_button.AutoSize = true;
-            this.volumedown_button.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("volumedown_button.BackgroundImage")));
+            this.volumedown_button.BackgroundImage = global::MusicCast_Control.Properties.Resources.voldown;
             this.volumedown_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.volumedown_button.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.volumedown_button.ForeColor = System.Drawing.Color.Green;
@@ -166,7 +164,7 @@ namespace MusicCast_Control
             // volumeup_button
             // 
             this.volumeup_button.AutoSize = true;
-            this.volumeup_button.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("volumeup_button.BackgroundImage")));
+            this.volumeup_button.BackgroundImage = global::MusicCast_Control.Properties.Resources.volup;
             this.volumeup_button.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.volumeup_button.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
             this.volumeup_button.ForeColor = System.Drawing.Color.LawnGreen;
@@ -209,83 +207,7 @@ namespace MusicCast_Control
 
         }
 
-        private async void labels()
-        {
-
-            //
-            // read the json settings file
-            //
-            string[] inputs = new string[50];
-            if (File.Exists("settings.json"))
-            {
-                string settingsjson = File.ReadAllText("settings.json");
-                var settings = JsonObject.Parse(settingsjson);
-
-                // add inputs to combobox
-                inputs = Regex.Replace(Convert.ToString(settings["inputs"]), "[ \"\n\r\\[\\]\t]", "").Split(","); // fix this at some point
-                foreach (var input in inputs)
-                {
-                    this.inputChange.Items.Add(input);
-
-                }
-                // set the ip address
-                mcip = settings["ip_address"].ToString();
-            } else
-            {
-                this.inputChange.Items.Add("Optical");
-                mcip = "192.168.0.10";
-            }
-            ip_address.Text = mcip; // change ip info label
-
-
-            //
-            // get the amplifier status, device info and features
-            //
-            using var client = new HttpClient();
-            var statusjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/getStatus");
-            var deviceinfojson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getDeviceInfo");
-            var featuresjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getFeatures");
-            var status = JsonObject.Parse(statusjson);
-            var deviceinfo = JsonObject.Parse(deviceinfojson);
-            var features = JsonObject.Parse(featuresjson);
-            input_list = Convert.ToString(features["zone"][0]["input_list"]);
-
-
-            // 
-            // info fields
-            // 
-            // power and input on start
-            info.Text = "Power: " + (string)status["power"] + "; Input: " + (string)status["input"];
-            
-            // device model
-            center_text.Text = (string)deviceinfo["model_name"];
-
-            // get the maximum, current volume and startup input source
-            maxVol = Convert.ToString(status["max_volume"]);
-            curVol = Convert.ToString(status["volume"]);
-            currentInput = Convert.ToString(status["input"]);
-            mute = (bool)status["mute"];
-
-            // volume
-            if (mute)
-            {
-                volume.Text = "muted";
-            }
-            else
-            {
-                volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
-            }
-
-            // Show the selected input on input list as default
-            foreach (var input in inputs)
-            {
-                if (currentInput == input.ToLower())
-                {
-                    inputChange.Text = input;
-                }
-            }
-                
-        }
+        
 
         #endregion
         private Button power_button;
