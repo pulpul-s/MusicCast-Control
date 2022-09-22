@@ -24,4 +24,4 @@ Complete input device list:<br />
 Note that you can use capitalized letters when adding devices.
 
 ## TODO
-The plan is to add additional controls that the official mobile application has. Including subwoofer, balance and playback control.
+The plan is to add some of the additional controls that the official mobile application has. Including subwoofer, balance and playback control.
