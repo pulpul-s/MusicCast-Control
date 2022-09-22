@@ -21,6 +21,6 @@ Commonly supported devices are e.g.:<br />
 * optical
 * aux<br /><br />
 note: You can use capitalized letters when adding devices.
-<br />
+
 ## TODO
 The plan is to add additional controls that the official mobile application has. Including subwoofer, balance and playback control.
