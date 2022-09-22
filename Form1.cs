@@ -33,7 +33,7 @@ namespace MusicCast_Control
         // read the json settings file
         //
         string[] inputs = new string[50];
-        private async void read_settings()
+        private void read_settings()
         {
 
             if (File.Exists("settings.json"))
@@ -66,51 +66,61 @@ namespace MusicCast_Control
         {
             using var client = new HttpClient();
 
-            var statusjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/getStatus");
-            var deviceinfojson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getDeviceInfo");
-            var featuresjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getFeatures");
-
-            var status = JsonObject.Parse(statusjson);
-            var deviceinfo = JsonObject.Parse(deviceinfojson);
-            var features = JsonObject.Parse(featuresjson);
-            input_list = Convert.ToString(features["zone"][0]["input_list"]);
-
-
-            // 
-            // info fields
-            // 
-            // power and input on start
-            info.Text = "Power: " + (string)status["power"] + "; Input: " + (string)status["input"];
-
-            // device model
-            center_text.Text = (string)deviceinfo["model_name"];
-
-            // get the maximum, current volume and startup input source
-            maxVol = Convert.ToString(status["max_volume"]);
-            curVol = Convert.ToString(status["volume"]);
-            currentInput = Convert.ToString(status["input"]);
-            mute = (bool)status["mute"];
-
-            // volume
-            if (mute)
+            try
             {
-                volume.Text = "muted";
-            }
-            else
-            {
-                volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
-            }
+                var statusjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/getStatus");
+                var deviceinfojson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getDeviceInfo");
+                var featuresjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getFeatures");
 
-            // Show the selected input on input list as default
-            foreach (var input in inputs)
-            {
-                if (currentInput == input.ToLower())
+                var status = JsonObject.Parse(statusjson);
+                var deviceinfo = JsonObject.Parse(deviceinfojson);
+                var features = JsonObject.Parse(featuresjson);
+                input_list = Convert.ToString(features["zone"][0]["input_list"]);
+
+
+                // 
+                // info fields
+                // 
+                // power and input on start
+                info.Text = "Power: " + (string)status["power"] + "; Input: " + (string)status["input"];
+
+                // device model
+                center_text.Text = (string)deviceinfo["model_name"];
+
+                // get the maximum, current volume and startup input source
+                maxVol = Convert.ToString(status["max_volume"]);
+                curVol = Convert.ToString(status["volume"]);
+                currentInput = Convert.ToString(status["input"]);
+                mute = (bool)status["mute"];
+
+                // volume
+                if (mute)
                 {
-                    inputChange.Text = input;
+                    volume.Text = "muted";
                 }
+                else
+                {
+                    volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
+                }
+
+                // Show the selected input on input list as default
+                foreach (var input in inputs)
+                {
+                    if (currentInput == input.ToLower())
+                    {
+                        inputChange.Text = input;
+                    }
+                }
+
             }
 
-
+            catch (Exception ex)
+            {
+                center_text.Text = "No MusicCast";
+            } finally
+            {
+                fetch_info();
+            }
         }
 
         //
@@ -226,8 +236,8 @@ namespace MusicCast_Control
         }
 
 
-        BackgroundWorker bg;
-        private async void backgroundUpdate()
+        BackgroundWorker? bg;
+        private void backgroundUpdate()
         {
             bg = new BackgroundWorker();
             bg.DoWork += (obj, ea) => updateFieldsLoop();
