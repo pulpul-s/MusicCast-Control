@@ -1,6 +1,7 @@
 # MusicCast Control
 
-A simple Windows GUI to control your Yamaha MusicCast amplifier. Should work with all MusicCast devices with API support enabled.
+A simple Windows GUI to control your Yamaha MusicCast amplifier.<br />
+Should work with all MusicCast devices with API support enabled.
 
 ## Features
 * Power
