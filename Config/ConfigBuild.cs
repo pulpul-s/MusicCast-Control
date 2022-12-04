@@ -1,36 +1,37 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#region
+
 using System.Text;
-using System.Text.Json.Nodes;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-namespace MusicCast_Control.Config
+#endregion
+
+namespace MusicCast_Control.Config;
+
+internal class ConfigBuild
 {
-    internal class ConfigBuild
+    public string ConfigPath { get; set; } = "Config.json";
+    public ConfigTemplate Config { get; set; }
+
+    public async Task InitializeAsync()
     {
-        public string ConfigPath { get; set; } = "Config.json";
-        public ConfigTemplate Config { get; set; }
+        var json = string.Empty;
 
-        public async Task InitializeAsync()
+        if (!File.Exists(ConfigPath))
         {
-            var json = string.Empty;
-
-            if (!File.Exists(ConfigPath))
-            {
-                json = JsonConvert.SerializeObject(GenerateNewConfig(), Formatting.Indented);
-                File.WriteAllText("Config.json", json, new UTF8Encoding(false));
-                await Task.Delay(-1);
-            }
-
-            json = File.ReadAllText(ConfigPath, new UTF8Encoding(false));
-            Config = JsonConvert.DeserializeObject<ConfigTemplate>(json);
+            json = JsonConvert.SerializeObject(GenerateNewConfig(), Formatting.Indented);
+            File.WriteAllText("Config.json", json, new UTF8Encoding(false));
+            await Task.Delay(-1);
         }
 
-        private ConfigTemplate GenerateNewConfig() => new ConfigTemplate
+        json = File.ReadAllText(ConfigPath, new UTF8Encoding(false));
+        Config = JsonConvert.DeserializeObject<ConfigTemplate>(json);
+    }
+
+    private ConfigTemplate GenerateNewConfig()
+    {
+        return new()
         {
-            IP = "IP",
+            IP = "IP"
         };
     }
 }

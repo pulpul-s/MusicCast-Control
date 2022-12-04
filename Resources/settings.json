@@ -1,10 +1,10 @@
 {
-"ip_address": "192.168.0.10",
-"inputs": [
-	"AUX",
-	"Bluetooth",
-	"Optical",
-	"Spotify",
-	"USB"
-	]
+  "ip_address": "192.168.0.10",
+  "inputs": [
+    "AUX",
+    "Bluetooth",
+    "Optical",
+    "Spotify",
+    "USB"
+  ]
 }
