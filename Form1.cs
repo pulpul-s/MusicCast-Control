@@ -1,12 +1,29 @@
+using MusicCast_Control.Config;
 using System.ComponentModel;
 using System.Net.NetworkInformation;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using YamahaReceiverLib;
+using YamahaReceiverLib.CD;
+using YamahaReceiverLib.Clock;
+using YamahaReceiverLib.System;
+using YamahaReceiverLib.Tuner;
+using YamahaReceiverLib.Zone;
 
 namespace MusicCast_Control
 {
     public partial class Form1 : Form
     {
+        YamahaAV yamahaAV = new();
+
+        SystemConfig systemconfig = new();
+
+        ZoneConfig zoneconfig = new();
+
+        HttpClient client = new();
+
+        ConfigBuild config = new();
+
         public Form1()
         {
             InitializeComponent();
@@ -14,18 +31,11 @@ namespace MusicCast_Control
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            read_settings();
-            var ping = new Ping();
-            var pingresult = ping.Send(mcip);
-            if (pingresult.Status == 0)
-            {
-                fetch_info();
-                backgroundUpdate();
-            }
-            else
-            {
-                center_text.Text = "IP unreachable";
-            }
+            config.InitializeAsync();
+            YamahaAV.ip = config.Config.IP;
+            mcip = config.Config.IP;
+            fetch_info();
+            backgroundUpdate();
         }
 
 
@@ -33,13 +43,14 @@ namespace MusicCast_Control
         // read the json settings file
         //
         string[] inputs = new string[50];
+        /*
+
         private void read_settings()
         {
-
             if (File.Exists("settings.json"))
             {
                 string settingsjson = File.ReadAllText("settings.json");
-                var settings = JsonObject.Parse(settingsjson);
+                var settings = JsonNode.Parse(settingsjson);
 
                 // add inputs to combobox
                 inputs = Regex.Replace(Convert.ToString(settings["inputs"]), "[ \"\n\r\\[\\]\t]", "").Split(","); // fix this at some point
@@ -54,27 +65,30 @@ namespace MusicCast_Control
             else
             {
                 this.inputChange.Items.Add("Optical");
-                mcip = "192.168.0.10";
+                mcip = "192.168.1.50";
             }
             ip_address.Text = mcip; // change ip info label
         }
+
+        */
 
         //
         // get the amplifier status, device info and features
         //
         private async void fetch_info()
         {
-            using var client = new HttpClient();
-
             try
             {
-                var statusjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/getStatus");
-                var deviceinfojson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getDeviceInfo");
-                var featuresjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/system/getFeatures");
+                ip_address.Text = mcip;
+                var statusjson = await zoneconfig.getStatus(ZoneConfig.zone.main);
+                var deviceinfojson = await systemconfig.getDeviceInfo();
+                var featuresjson = await systemconfig.getFeatures();
+                var signalinfojson = await zoneconfig.getSignalInfo(ZoneConfig.zone.main);
 
-                var status = JsonObject.Parse(statusjson);
-                var deviceinfo = JsonObject.Parse(deviceinfojson);
-                var features = JsonObject.Parse(featuresjson);
+                var status = JsonNode.Parse(statusjson);
+                var deviceinfo = JsonNode.Parse(deviceinfojson);
+                var features = JsonNode.Parse(featuresjson);
+                var signalinfo = JsonNode.Parse(signalinfojson);
                 input_list = Convert.ToString(features["zone"][0]["input_list"]);
 
 
@@ -92,6 +106,21 @@ namespace MusicCast_Control
                 curVol = Convert.ToString(status["volume"]);
                 currentInput = Convert.ToString(status["input"]);
                 mute = (bool)status["mute"];
+                BassLabel.Text = $"Bass Lvl :{Convert.ToString(status["subwoofer_volume"])}";
+                curBass = int.Parse(Convert.ToString(status["subwoofer_volume"]));
+
+                PureDirect = (bool)status["pure_direct"];
+                Enhancer = (bool)status["enhancer"];
+                ExtraBass = (bool)status["extra_bass"];
+                Adaptivedrc = (bool)status["adaptive_drc"];
+
+                PureDirectLabel.Text = $"Pure Direct: {PureDirect}";
+                EnhancerLabel.Text = $"Enhancer: {Enhancer}";
+                AdaDRCLabal.Text = $"Adaptive drc: {ExtraBass}";
+                ExtraBassLabal.Text = $"Extra Bass: {Adaptivedrc}";
+
+                SignalInfoLabel.Text = $"format: {signalinfo["audio"]["format"]}\nfs: {signalinfo["audio"]["fs"]}";
+
 
                 // volume
                 if (mute)
@@ -129,8 +158,8 @@ namespace MusicCast_Control
         private async void power_button_Click(object sender, EventArgs e)
         {
             // power toggle
-            using var client = new HttpClient();
-            var powerToggle = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setPower?power=toggle");
+            
+            var powerToggle = await zoneconfig.setPower(ZoneConfig.zone.main);
         }
 
         private async void volumedown_button_Click(object sender, EventArgs e)
@@ -139,8 +168,8 @@ namespace MusicCast_Control
             if (Convert.ToInt32(curVol) > 0)
             {
                 int setVol = Convert.ToInt32(curVol) - 1;
-                using var client = new HttpClient();
-                var incVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setVolume?volume=" + setVol);
+                
+                var incVol = await zoneconfig.setVolume(ZoneConfig.zone.main, setVol);
                 curVol = Convert.ToString(setVol);
                 mute = false;
                 updateVolume();
@@ -153,8 +182,8 @@ namespace MusicCast_Control
             if (Convert.ToInt32(curVol) < Convert.ToInt32(maxVol))
             {
                 int setVol = Convert.ToInt32(curVol) + 1;
-                using var client = new HttpClient();
-                var incVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setVolume?volume=" + setVol);
+                
+                var incVol = await zoneconfig.setVolume(ZoneConfig.zone.main, setVol);
                 curVol = Convert.ToString(setVol);
                 mute = false;
                 updateVolume();
@@ -163,16 +192,16 @@ namespace MusicCast_Control
 
         private async void mute_button_Click(object sender, EventArgs e)
         {
-            using var client = new HttpClient();
+            
             if (!mute)
             {
-                var muteVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setMute?enable=true");
+                var muteVol = await zoneconfig.setMute(ZoneConfig.zone.main, "true");
                 mute = true;
                 volume.Text = "muted";
             }
             else
             {
-                var muteVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setMute?enable=false");
+                var muteVol = await zoneconfig.setMute(ZoneConfig.zone.main, "false");
                 updateVolume();
                 mute = false;
             }
@@ -185,8 +214,8 @@ namespace MusicCast_Control
             if (Convert.ToInt32(curVol) > 0)
             {
                 int setVol = Convert.ToInt32(curVol) - 1;
-                using var client = new HttpClient();
-                var incVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setVolume?volume=" + setVol);
+                
+                var incVol = await zoneconfig.setVolume(ZoneConfig.zone.main, setVol);
                 curVol = Convert.ToString(setVol);
                 updateVolume();
             }
@@ -198,8 +227,8 @@ namespace MusicCast_Control
             if (Convert.ToInt32(curVol) < Convert.ToInt32(maxVol))
             {
                 int setVol = Convert.ToInt32(curVol) + 1;
-                using var client = new HttpClient();
-                var incVol = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setVolume?volume=" + setVol);
+                
+                var incVol = await zoneconfig.setVolume(ZoneConfig.zone.main, setVol);
                 curVol = Convert.ToString(setVol);
                 updateVolume();
             }
@@ -207,22 +236,22 @@ namespace MusicCast_Control
 
         private async void updateVolume()
         {
-            using var client = new HttpClient();
-            var statusjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/getStatus");
-            var status = JsonObject.Parse(statusjson);
+            
+            var statusjson = await zoneconfig.getStatus(ZoneConfig.zone.main);
+            var status = JsonNode.Parse(statusjson);
             volume.Text = Convert.ToString(status["actual_volume"]["value"]) + " dB";
         }
 
         private async void inputChange_SelectedIndexChanged(object sender, EventArgs e)
         {
             this.ActiveControl = null; // prevent focus after selection to make it prettier
-            using var client = new HttpClient();
+            
 
             // check which input is selected, convert it to lowercase in case and switch to it
             var selectedInput = ((string)inputChange.SelectedItem).ToLower();
             if (currentInput != selectedInput)
             {
-                await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/setInput?input=" + selectedInput);
+                await zoneconfig.setInput(ZoneConfig.zone.main, "true", selectedInput);
                 currentInput = selectedInput;
             }
         }
@@ -245,11 +274,11 @@ namespace MusicCast_Control
         }
         private async void updateFieldsLoop()
         {
-            using var client = new HttpClient();
+            
             while (true)
             {
-                var statusjson = await client.GetStringAsync("http://" + mcip + "/YamahaExtendedControl/v1/main/getStatus");
-                var status = JsonObject.Parse(statusjson);
+                var statusjson = await zoneconfig.getStatus(ZoneConfig.zone.main);
+                var status = JsonNode.Parse(statusjson);
                 info.Text = "Power: " + (string)status["power"] + "; Input: " + (string)status["input"];
                 if (mute)
                 {
@@ -261,6 +290,56 @@ namespace MusicCast_Control
                 }
                 System.Threading.Thread.Sleep(1000);
             }
+        }
+
+        private void BassUp_Click(object sender, EventArgs e)
+        {
+            if (curBass >= minBass || curBass <= maxBass)
+            {
+                curBass = curBass + 1;
+                zoneconfig.setSubwooferVolume(ZoneConfig.zone.main, curBass);
+            }
+        }
+
+        private void BassDown_Click(object sender, EventArgs e)
+        {
+            if (curBass >= minBass || curBass <= maxBass)
+            {
+                curBass = curBass - 1;
+                zoneconfig.setSubwooferVolume(ZoneConfig.zone.main, curBass);
+            }
+        }
+
+        private void PureDirectToggle_Click(object sender, EventArgs e)
+        {
+            if(!PureDirect)
+                zoneconfig.setPureDirect(ZoneConfig.zone.main, "true");
+            else
+                zoneconfig.setPureDirect(ZoneConfig.zone.main, "false");
+            PureDirectLabel.Text = $"Pure Direct: {PureDirect}";
+        }
+
+        private void EnhancerToggle_Click(object sender, EventArgs e)
+        {
+            if (!Enhancer)
+                zoneconfig.setEnhancer(ZoneConfig.zone.main, "true");
+            else
+                zoneconfig.setEnhancer(ZoneConfig.zone.main, "false");
+            EnhancerLabel.Text = $"Enhancer: {Enhancer}";
+        }
+
+        private void AdaptativeDRCToggle_Click(object sender, EventArgs e)
+        {
+            AdaDRCLabal.Text = $"Adaptive drc: {Adaptivedrc}";
+        }
+
+        private void ExtreBassToggle_Click(object sender, EventArgs e)
+        {
+            if (!ExtraBass)
+                zoneconfig.setBassExtension(ZoneConfig.zone.main, "true");
+            else
+                zoneconfig.setBassExtension(ZoneConfig.zone.main, "false");
+            ExtraBassLabal.Text = $"Extra Bass: {ExtraBass}";
         }
     }
 }

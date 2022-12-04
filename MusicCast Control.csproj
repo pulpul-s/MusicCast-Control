@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net7.0-windows7.0</TargetFramework>
     <RootNamespace>MusicCast_Control</RootNamespace>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
@@ -22,6 +22,16 @@
 
   <ItemGroup>
     <Content Include="Resources\mcc_icon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="YamahaReceiverLib">
+      <HintPath>..\..\source\repos\YamahaReceiverLib\bin\Release\net7.0\YamahaReceiverLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
