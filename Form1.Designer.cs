@@ -370,7 +370,7 @@ namespace MusicCast_Control
         private string maxVol;
         private string curVol;
         private Label cypyright;
-        private string mcip = "192.168.1.50";
+        private string mcip;
         private ComboBox inputChange;
         private Label volume;
         private string currentInput;
